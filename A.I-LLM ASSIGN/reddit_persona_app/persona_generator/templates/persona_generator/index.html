@@ -1,0 +1,41 @@
+{% extends 'persona_generator/base.html' %}
+{% load static %}
+
+{% block title %}Generate Reddit Persona{% endblock %}
+
+{% block content %}
+<section class="hero">
+    <div class="hero-content">
+        <h1>Uncover Reddit Personas with AI</h1>
+        <p>Enter a Reddit user's profile URL to generate a detailed user persona, powered by advanced AI and citing original content.</p>
+        <form id="persona-form" method="post" action="{% url 'persona_generator:generate_persona' %}">
+            {% csrf_token %}
+            <input type="url" name="reddit_url" placeholder="e.g., https://www.reddit.com/user/kojied/" required>
+            <button type="submit">Generate Persona</button>
+        </form>
+        <div id="status-message" class="status-message"></div>
+        <div id="loading-indicator" class="loading-indicator is-hidden">
+            <div class="spinner"></div>
+            <p>Generating persona... This may take a moment.</p>
+        </div>
+    </div>
+</section>
+
+<section class="past-personas">
+    <h2>Past Generated Personas</h2>
+    {% if personas %}
+    <div class="persona-list">
+        {% for persona in personas %}
+        <div class="persona-card">
+            <h3>Persona for u/{{ persona.reddit_username }}</h3>
+            <p>{{ persona.persona_text|truncatechars:150 }}</p>
+            <small>Generated on: {{ persona.generated_at|date:"M d, Y H:i" }}</small>
+            <a href="{% url 'persona_generator:persona_detail' persona.pk %}" class="view-detail-btn">View Details</a>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p>No personas generated yet. Be the first!</p>
+    {% endif %}
+</section>
+{% endblock %}

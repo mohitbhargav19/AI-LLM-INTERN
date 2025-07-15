@@ -1,0 +1,54 @@
+{% extends 'persona_generator/base.html' %}
+{% load static %}
+
+{% block title %}Persona Detail for u/{{ persona.reddit_username }}{% endblock %}
+
+{% block content %}
+<section class="persona-detail-section">
+    <div class="persona-header">
+        <h1>User Persona for <span class="username">u/{{ persona.reddit_username }}</span></h1>
+        <p class="generated-date">Generated on: {{ persona.generated_at|date:"M d, Y H:i" }}</p>
+    </div>
+
+    <div class="persona-summary">
+        <h2>Overall Persona Summary</h2>
+        <p>{{ persona.persona_text }}</p>
+    </div>
+
+    <div class="persona-characteristics">
+        <h2>Key Characteristics</h2>
+        {% if persona.characteristics.all %}
+            {% for char in persona.characteristics.all %}
+                <div class="characteristic-card">
+                    <h3>{{ char.characteristic }}</h3>
+                    {% if char.parsed_citations %}
+                        <div class="citations-toggle">
+                            <button class="toggle-citations-btn" data-target="citations-{{ char.id }}">Show Citations ({{ char.parsed_citations|length }})</button>
+                            <div id="citations-{{ char.id }}" class="citations-list is-hidden">
+                                <h4>Citations:</h4>
+                                <ul>
+                                    {% for citation in char.parsed_citations %}
+                                        <li>
+                                            <a href="{{ citation.url }}" target="_blank" rel="noopener noreferrer">
+                                                {{ citation.type|capfirst }}: "{{ citation.snippet }}"
+                                            </a>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            </div>
+                        </div>
+                    {% else %}
+                        <p class="no-citations">No direct citations found for this characteristic.</p>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No specific characteristics found for this persona.</p>
+        {% endif %}
+    </div>
+
+    <div class="back-link">
+        <a href="{% url 'persona_generator:index' %}">← Back to Home</a>
+    </div>
+</section>
+{% endblock %}
